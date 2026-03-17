@@ -56,6 +56,7 @@ describe("client context store", () => {
           x: {
             apiBase: " ",
             companyId: " ",
+            apiKey: " ",
             apiKeyEnvVarName: " ",
           },
         },

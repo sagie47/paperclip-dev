@@ -47,6 +47,7 @@ export interface Config {
   authBaseUrlMode: AuthBaseUrlMode;
   authPublicBaseUrl: string | undefined;
   authDisableSignUp: boolean;
+  boardApiTokens: string[];
   databaseMode: DatabaseMode;
   databaseUrl: string | undefined;
   embeddedPostgresDataDir: string;
@@ -157,6 +158,17 @@ export function loadConfig(): Config {
     disableSignUpFromEnv !== undefined
       ? disableSignUpFromEnv === "true"
       : (fileConfig?.auth?.disableSignUp ?? false);
+  const boardApiTokens = Array.from(
+    new Set(
+      [
+        ...(process.env.PAPERCLIP_OPERATOR_API_TOKEN?.trim() ? [process.env.PAPERCLIP_OPERATOR_API_TOKEN.trim()] : []),
+        ...(process.env.PAPERCLIP_OPERATOR_API_TOKENS ?? "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0),
+      ],
+    ),
+  );
   const allowedHostnamesFromEnvRaw = process.env.PAPERCLIP_ALLOWED_HOSTNAMES;
   const allowedHostnamesFromEnv = allowedHostnamesFromEnvRaw
     ? allowedHostnamesFromEnvRaw
@@ -219,6 +231,7 @@ export function loadConfig(): Config {
     authBaseUrlMode,
     authPublicBaseUrl,
     authDisableSignUp,
+    boardApiTokens,
     databaseMode: fileDatabaseMode,
     databaseUrl: process.env.DATABASE_URL ?? fileDbUrl,
     embeddedPostgresDataDir: resolveHomeAwarePath(

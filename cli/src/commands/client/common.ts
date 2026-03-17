@@ -30,7 +30,7 @@ export function addCommonClientOptions(command: Command, opts?: { includeCompany
     .option("--context <path>", "Path to CLI context file")
     .option("--profile <name>", "CLI context profile name")
     .option("--api-base <url>", "Base URL for the Paperclip API")
-    .option("--api-key <token>", "Bearer token for agent-authenticated calls")
+    .option("--api-key <token>", "Bearer token for authenticated API calls")
     .option("--json", "Output raw JSON");
 
   if (opts?.includeCompany) {
@@ -56,6 +56,7 @@ export function resolveCommandContext(
   const apiKey =
     options.apiKey?.trim() ||
     process.env.PAPERCLIP_API_KEY?.trim() ||
+    profile.apiKey?.trim() ||
     readKeyFromProfileEnv(profile);
 
   const companyId =

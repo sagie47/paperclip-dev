@@ -40,6 +40,7 @@ type OnboardOptions = {
   config?: string;
   run?: boolean;
   yes?: boolean;
+  fromEnv?: boolean;
   invokedByRun?: boolean;
 };
 
@@ -258,9 +259,13 @@ export async function onboard(opts: OnboardOptions): Promise<void> {
     }
   }
 
+  const nonInteractiveFromEnv = opts.fromEnv === true;
+
   let setupMode: SetupMode = "quickstart";
   if (opts.yes) {
     p.log.message(pc.dim("`--yes` enabled: using Quickstart defaults."));
+  } else if (nonInteractiveFromEnv || !process.stdin.isTTY || !process.stdout.isTTY) {
+    p.log.message(pc.dim("Using quickstart defaults in non-interactive mode."));
   } else {
     const setupModeChoice = await p.select({
       message: "Choose setup path",
@@ -384,6 +389,9 @@ export async function onboard(opts: OnboardOptions): Promise<void> {
   } else {
     p.log.step(pc.bold("Quickstart"));
     p.log.message(pc.dim("Using quickstart defaults."));
+    if (nonInteractiveFromEnv) {
+      p.log.message(pc.dim("--from-env enabled: skipped interactive prompts."));
+    }
     if (usedEnvKeys.length > 0) {
       p.log.message(pc.dim(`Environment-aware defaults active (${usedEnvKeys.length} env var(s) detected).`));
     } else {

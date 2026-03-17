@@ -63,6 +63,7 @@ export async function createApp(
     localPluginDir?: string;
     betterAuthHandler?: express.RequestHandler;
     resolveSession?: (req: ExpressRequest) => Promise<BetterAuthSessionResult | null>;
+    boardApiTokens?: string[];
   },
 ) {
   const app = express();
@@ -89,6 +90,7 @@ export async function createApp(
   app.use(
     actorMiddleware(db, {
       deploymentMode: opts.deploymentMode,
+      boardApiTokens: opts.boardApiTokens,
       resolveSession: opts.resolveSession,
     }),
   );
