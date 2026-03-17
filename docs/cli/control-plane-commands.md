@@ -107,3 +107,22 @@ pnpm paperclipai dashboard get
 ```sh
 pnpm paperclipai heartbeat run --agent-id <agent-id> [--api-base http://localhost:3100]
 ```
+
+
+## Low-level API passthrough (SSH parity)
+
+When a workflow exists in the GUI/API but does not yet have a dedicated high-level CLI subcommand, use:
+
+```sh
+pnpm paperclipai api get /api/plugins
+pnpm paperclipai api post /api/companies/<company-id>/goals --body '{"title":"Ship SSH UX","status":"planned"}'
+pnpm paperclipai api patch /api/issues/<issue-id> --body-file ./issue-update.json
+cat ./approval-decision.json | pnpm paperclipai api post /api/approvals/<approval-id>/approve --stdin
+```
+
+Supports repeatable flags:
+
+```sh
+pnpm paperclipai api get /api/companies/<company-id>/issues --query status=todo --query priority=high
+pnpm paperclipai api get /api/plugins --header x-trace-id=ssh-session-1
+```

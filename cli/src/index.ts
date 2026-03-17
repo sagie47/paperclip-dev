@@ -21,6 +21,7 @@ import { applyDataDirOverride, type DataDirOptionLike } from "./config/data-dir.
 import { loadPaperclipEnvFile } from "./config/env.js";
 import { registerWorktreeCommands } from "./commands/worktree.js";
 import { registerPluginCommands } from "./commands/client/plugin.js";
+import { registerApiCommands } from "./commands/client/api.js";
 
 const program = new Command();
 const DATA_DIR_OPTION_HELP =
@@ -143,6 +144,7 @@ registerActivityCommands(program);
 registerDashboardCommands(program);
 registerWorktreeCommands(program);
 registerPluginCommands(program);
+registerApiCommands(program);
 
 const auth = program.command("auth").description("Authentication and bootstrap utilities");
 
