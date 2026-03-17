@@ -81,6 +81,18 @@ pnpm paperclipai run --data-dir ./tmp/paperclip-dev
 pnpm paperclipai issue list --data-dir ./tmp/paperclip-dev
 ```
 
+
+For any API route that does not yet have a dedicated high-level command, use the low-level API passthrough commands:
+
+```sh
+pnpm paperclipai api get /api/plugins
+pnpm paperclipai api post /api/companies/<company-id>/goals --body '{"title":"Ship SSH UX","status":"planned"}'
+pnpm paperclipai api patch /api/issues/<issue-id> --body-file ./issue-update.json
+cat ./approval-decision.json | pnpm paperclipai api post /api/approvals/<approval-id>/approve --stdin
+```
+
+`paperclipai api <method>` supports repeatable `--query key=value` and `--header key=value` flags, so board operators can exercise the complete GUI API surface entirely from SSH/headless sessions without losing functionality.
+
 ## Context Profiles
 
 Store local defaults in `~/.paperclip/context.json`:
