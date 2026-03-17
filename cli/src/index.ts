@@ -7,6 +7,7 @@ import { addAllowedHostname } from "./commands/allowed-hostname.js";
 import { heartbeatRun } from "./commands/heartbeat-run.js";
 import { runCommand } from "./commands/run.js";
 import { bootstrapCeoInvite } from "./commands/auth-bootstrap-ceo.js";
+import { authLogin } from "./commands/auth-login.js";
 import { dbBackupCommand } from "./commands/db-backup.js";
 import { registerContextCommands } from "./commands/client/context.js";
 import { registerCompanyCommands } from "./commands/client/company.js";
@@ -46,6 +47,7 @@ program
   .option("-d, --data-dir <path>", DATA_DIR_OPTION_HELP)
   .option("-y, --yes", "Accept defaults (quickstart + start immediately)", false)
   .option("--run", "Start Paperclip immediately after saving config", false)
+  .option("--from-env", "Use environment/default values without interactive prompts", false)
   .action(onboard);
 
 program
@@ -73,6 +75,7 @@ program
   .option("-c, --config <path>", "Path to config file")
   .option("-d, --data-dir <path>", DATA_DIR_OPTION_HELP)
   .option("-s, --section <section>", "Section to configure (llm, database, logging, server, storage, secrets)")
+  .option("--from-env", "Update selected section(s) from environment/defaults without prompts", false)
   .action(configure);
 
 program
@@ -117,7 +120,7 @@ heartbeat
   .option("--context <path>", "Path to CLI context file")
   .option("--profile <name>", "CLI context profile name")
   .option("--api-base <url>", "Base URL for the Paperclip server API")
-  .option("--api-key <token>", "Bearer token for agent-authenticated calls")
+  .option("--api-key <token>", "Bearer token for authenticated API calls")
   .option(
     "--source <source>",
     "Invocation source (timer | assignment | on_demand | automation)",
@@ -140,6 +143,19 @@ registerWorktreeCommands(program);
 registerPluginCommands(program);
 
 const auth = program.command("auth").description("Authentication and bootstrap utilities");
+
+
+auth
+  .command("login")
+  .description("Store an operator bearer token for SSH/headless API access")
+  .option("--context <path>", "Path to CLI context file")
+  .option("--profile <name>", "Profile name (default: current profile)")
+  .option("--token <token>", "Operator bearer token")
+  .option("--api-base <url>", "Default API base URL")
+  .option("--company-id <id>", "Default company ID")
+  .option("--use", "Set this profile as active")
+  .option("--json", "Output raw JSON")
+  .action(authLogin);
 
 auth
   .command("bootstrap-ceo")

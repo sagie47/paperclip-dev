@@ -27,6 +27,17 @@ pnpm paperclipai run --instance dev
 
 ## Deployment Modes
 
+
+For non-interactive automation (CI/SSH), you can skip prompts:
+
+```sh
+pnpm paperclipai onboard --from-env
+pnpm paperclipai configure --from-env --section server
+```
+
+These commands apply environment-driven defaults without interactive prompts.
+
+
 Mode taxonomy and design intent are documented in `doc/DEPLOYMENT-MODES.md`.
 
 Current CLI behavior:
@@ -47,12 +58,21 @@ All client commands support:
 
 - `--data-dir <path>`
 - `--api-base <url>`
-- `--api-key <token>`
+- `--api-key <token>` (agent or operator bearer token)
 - `--context <path>`
 - `--profile <name>`
 - `--json`
 
 Company-scoped commands also support `--company-id <id>`.
+
+
+SSH/headless operator login (stores token in CLI context profile):
+
+```sh
+pnpm paperclipai auth login --token <operator-token> --api-base http://127.0.0.1:3100 --profile ssh --use
+```
+
+You can also provide the token via `PAPERCLIP_OPERATOR_TOKEN`.
 
 Use `--data-dir` on any CLI command to isolate all default local state (config/context/db/logs/storage/secrets) away from `~/.paperclip`:
 

@@ -14,6 +14,7 @@ function hashToken(token: string) {
 
 interface ActorMiddlewareOptions {
   deploymentMode: DeploymentMode;
+  boardApiTokens?: string[];
   resolveSession?: (req: Request) => Promise<BetterAuthSessionResult | null>;
 }
 
@@ -76,6 +77,19 @@ export function actorMiddleware(db: Db, opts: ActorMiddlewareOptions): RequestHa
 
     const token = authHeader.slice("bearer ".length).trim();
     if (!token) {
+      next();
+      return;
+    }
+
+    if (opts.boardApiTokens?.includes(token)) {
+      req.actor = {
+        type: "board",
+        userId: "operator-token",
+        companyIds: undefined,
+        isInstanceAdmin: true,
+        runId: runIdHeader ?? undefined,
+        source: "board_token",
+      };
       next();
       return;
     }

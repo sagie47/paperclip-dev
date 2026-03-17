@@ -49,6 +49,29 @@ describe("resolveCommandContext", () => {
     expect(resolved.api.apiKey).toBe("key-from-env");
   });
 
+
+  it("uses stored profile apiKey when env var is not set", () => {
+    const contextPath = createTempPath("context.json");
+
+    writeContext(
+      {
+        version: 1,
+        currentProfile: "ops",
+        profiles: {
+          ops: {
+            apiBase: "http://127.0.0.1:9999",
+            companyId: "company-profile",
+            apiKey: "stored-token",
+          },
+        },
+      },
+      contextPath,
+    );
+
+    const resolved = resolveCommandContext({ context: contextPath }, { requireCompany: true });
+    expect(resolved.api.apiKey).toBe("stored-token");
+  });
+
   it("prefers explicit options over profile values", () => {
     const contextPath = createTempPath("context.json");
     writeContext(
