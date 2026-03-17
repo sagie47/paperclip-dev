@@ -265,6 +265,55 @@ export function registerIssueCommands(program: Command): void {
 
   addCommonClientOptions(
     issue
+      .command("labels")
+      .description("List issue labels for a company")
+      .requiredOption("-C, --company-id <id>", "Company ID")
+      .action(async (opts: IssueBaseOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts, { requireCompany: true });
+          const rows = await ctx.api.get(`/api/companies/${ctx.companyId}/labels`);
+          printOutput(rows, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+    { includeCompany: false },
+  );
+
+  addCommonClientOptions(
+    issue
+      .command("docs")
+      .description("List issue documents")
+      .argument("<issueId>", "Issue ID")
+      .action(async (issueId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          const rows = await ctx.api.get(`/api/issues/${issueId}/documents`);
+          printOutput(rows, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    issue
+      .command("approvals")
+      .description("List approvals linked to an issue")
+      .argument("<issueId>", "Issue ID")
+      .action(async (issueId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          const rows = await ctx.api.get(`/api/issues/${issueId}/approvals`);
+          printOutput(rows, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    issue
       .command("release")
       .description("Release issue back to todo and clear assignee")
       .argument("<issueId>", "Issue ID")

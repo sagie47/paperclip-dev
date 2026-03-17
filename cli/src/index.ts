@@ -8,6 +8,7 @@ import { heartbeatRun } from "./commands/heartbeat-run.js";
 import { runCommand } from "./commands/run.js";
 import { bootstrapCeoInvite } from "./commands/auth-bootstrap-ceo.js";
 import { authLogin } from "./commands/auth-login.js";
+import { authWhoami } from "./commands/auth-whoami.js";
 import { dbBackupCommand } from "./commands/db-backup.js";
 import { registerContextCommands } from "./commands/client/context.js";
 import { registerCompanyCommands } from "./commands/client/company.js";
@@ -20,6 +21,11 @@ import { applyDataDirOverride, type DataDirOptionLike } from "./config/data-dir.
 import { loadPaperclipEnvFile } from "./config/env.js";
 import { registerWorktreeCommands } from "./commands/worktree.js";
 import { registerPluginCommands } from "./commands/client/plugin.js";
+import { registerGoalCommands } from "./commands/client/goal.js";
+import { registerProjectCommands } from "./commands/client/project.js";
+import { registerSecretCommands } from "./commands/client/secret.js";
+import { registerCostCommands } from "./commands/client/cost.js";
+import { registerAccessCommands } from "./commands/client/access.js";
 
 const program = new Command();
 const DATA_DIR_OPTION_HELP =
@@ -107,6 +113,7 @@ program
   .option("-i, --instance <id>", "Local instance id (default: default)")
   .option("--repair", "Attempt automatic repairs during doctor", true)
   .option("--no-repair", "Disable automatic repairs during doctor")
+  .option("-y, --yes", "Run non-interactively with defaults where needed", true)
   .action(runCommand);
 
 const heartbeat = program.command("heartbeat").description("Heartbeat utilities");
@@ -141,6 +148,11 @@ registerActivityCommands(program);
 registerDashboardCommands(program);
 registerWorktreeCommands(program);
 registerPluginCommands(program);
+registerGoalCommands(program);
+registerProjectCommands(program);
+registerSecretCommands(program);
+registerCostCommands(program);
+registerAccessCommands(program);
 
 const auth = program.command("auth").description("Authentication and bootstrap utilities");
 
@@ -156,6 +168,16 @@ auth
   .option("--use", "Set this profile as active")
   .option("--json", "Output raw JSON")
   .action(authLogin);
+
+auth
+  .command("whoami")
+  .description("Show current authenticated board actor from /api/auth/get-session")
+  .option("--context <path>", "Path to CLI context file")
+  .option("--profile <name>", "Profile name (default: current profile)")
+  .option("--api-base <url>", "Base URL for the Paperclip server API")
+  .option("--api-key <token>", "Bearer token for authenticated API calls")
+  .option("--json", "Output raw JSON")
+  .action(authWhoami);
 
 auth
   .command("bootstrap-ceo")

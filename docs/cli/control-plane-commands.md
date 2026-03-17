@@ -1,9 +1,19 @@
 ---
 title: Control-Plane Commands
-summary: Issue, agent, approval, and dashboard commands
+summary: SSH/headless control-plane commands for operators and agents
 ---
 
-Client-side commands for managing issues, agents, approvals, and more.
+Client-side commands for managing issues, agents, approvals, and more in SSH/headless environments.
+
+## SSH Auth & Identity
+
+```sh
+# Store operator token in context profile
+pnpm paperclipai auth login --token <operator-token> --api-base http://127.0.0.1:3100 --use
+
+# Verify active board identity/session
+pnpm paperclipai auth whoami
+```
 
 ## Issue Commands
 
@@ -28,6 +38,11 @@ pnpm paperclipai issue checkout <issue-id> --agent-id <agent-id>
 
 # Release task
 pnpm paperclipai issue release <issue-id>
+# Labels / docs / linked approvals
+pnpm paperclipai issue labels --company-id <company-id>
+pnpm paperclipai issue docs <issue-id>
+pnpm paperclipai issue approvals <issue-id>
+
 ```
 
 ## Company Commands
@@ -60,6 +75,14 @@ pnpm paperclipai company import \
 ```sh
 pnpm paperclipai agent list
 pnpm paperclipai agent get <agent-id>
+
+# Hire / update
+pnpm paperclipai agent hire --company-id <company-id> --name "Agent" --role "Engineer" --adapter codex_local
+pnpm paperclipai agent update <agent-id> [--status active] [--reports-to <manager-id>]
+
+# Agent keys / runs
+pnpm paperclipai agent keys <agent-id>
+pnpm paperclipai agent runs <agent-id>
 ```
 
 ## Approval Commands
@@ -106,4 +129,37 @@ pnpm paperclipai dashboard get
 
 ```sh
 pnpm paperclipai heartbeat run --agent-id <agent-id> [--api-base http://localhost:3100]
+```
+
+
+## Access (Invites & Join Requests)
+
+```sh
+pnpm paperclipai access invite --company-id <company-id> [--allowed-join-types both]
+pnpm paperclipai access revoke-invite <invite-id>
+pnpm paperclipai access join-requests --company-id <company-id> [--status pending_approval]
+pnpm paperclipai access approve-join --company-id <company-id> <join-request-id>
+pnpm paperclipai access reject-join --company-id <company-id> <join-request-id>
+```
+
+## Goals & Projects
+
+```sh
+pnpm paperclipai goal list --company-id <company-id>
+pnpm paperclipai goal create --company-id <company-id> --title "..."
+pnpm paperclipai project list --company-id <company-id>
+pnpm paperclipai project create --company-id <company-id> --name "..."
+```
+
+## Secrets & Costs
+
+```sh
+pnpm paperclipai secret providers --company-id <company-id>
+pnpm paperclipai secret list --company-id <company-id>
+pnpm paperclipai secret create --company-id <company-id> --name OPENAI_API_KEY --value "$OPENAI_API_KEY"
+
+pnpm paperclipai cost summary --company-id <company-id>
+pnpm paperclipai cost budgets --company-id <company-id>
+pnpm paperclipai cost set-company-budget --company-id <company-id> --budget-monthly-cents 500000
+pnpm paperclipai cost set-agent-budget <agent-id> --budget-monthly-cents 200000
 ```
