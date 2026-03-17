@@ -139,8 +139,8 @@ async function maybeRepair(
   if (result.status === "pass" || !result.canRepair || !result.repair) return false;
   if (!opts.repair) return false;
 
-  let shouldRepair = opts.yes;
-  if (!shouldRepair) {
+  let shouldRepair = opts.yes ?? opts.repair ?? false;
+  if (!shouldRepair && process.stdin.isTTY && process.stdout.isTTY) {
     const answer = await p.confirm({
       message: `Repair "${result.name}"?`,
       initialValue: true,
