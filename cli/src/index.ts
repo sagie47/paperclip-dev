@@ -8,6 +8,7 @@ import { heartbeatRun } from "./commands/heartbeat-run.js";
 import { runCommand } from "./commands/run.js";
 import { bootstrapCeoInvite } from "./commands/auth-bootstrap-ceo.js";
 import { authLogin } from "./commands/auth-login.js";
+import { authWhoami } from "./commands/auth-whoami.js";
 import { dbBackupCommand } from "./commands/db-backup.js";
 import { registerContextCommands } from "./commands/client/context.js";
 import { registerCompanyCommands } from "./commands/client/company.js";
@@ -107,6 +108,7 @@ program
   .option("-i, --instance <id>", "Local instance id (default: default)")
   .option("--repair", "Attempt automatic repairs during doctor", true)
   .option("--no-repair", "Disable automatic repairs during doctor")
+  .option("-y, --yes", "Run non-interactively with defaults where needed", true)
   .action(runCommand);
 
 const heartbeat = program.command("heartbeat").description("Heartbeat utilities");
@@ -156,6 +158,16 @@ auth
   .option("--use", "Set this profile as active")
   .option("--json", "Output raw JSON")
   .action(authLogin);
+
+auth
+  .command("whoami")
+  .description("Show current authenticated board actor from /api/auth/get-session")
+  .option("--context <path>", "Path to CLI context file")
+  .option("--profile <name>", "Profile name (default: current profile)")
+  .option("--api-base <url>", "Base URL for the Paperclip server API")
+  .option("--api-key <token>", "Bearer token for authenticated API calls")
+  .option("--json", "Output raw JSON")
+  .action(authWhoami);
 
 auth
   .command("bootstrap-ceo")
