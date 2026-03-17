@@ -217,6 +217,102 @@ export function registerAgentCommands(program: Command): void {
 
   addCommonClientOptions(
     agent
+      .command("hire")
+      .description("Create (hire) an agent")
+      .requiredOption("-C, --company-id <id>", "Company ID")
+      .requiredOption("--name <name>", "Agent name")
+      .requiredOption("--role <role>", "Agent role")
+      .requiredOption("--adapter <kind>", "Adapter kind (e.g. codex_local)")
+      .option("--reports-to <agentId>", "Manager agent ID")
+      .option("--description <text>", "Capabilities description")
+      .option("--budget-monthly-cents <cents>", "Monthly budget in cents")
+      .option("--max-concurrent-issues <n>", "Max concurrent issues")
+      .option("--json", "Output raw JSON")
+      .action(async (opts: BaseClientOptions & Record<string, string | undefined>) => {
+        try {
+          const ctx = resolveCommandContext(opts, { requireCompany: true });
+          const created = await ctx.api.post<Agent>(`/api/companies/${ctx.companyId}/agents`, {
+            name: opts.name,
+            role: opts.role,
+            adapterKind: opts.adapter,
+            reportsTo: opts.reportsTo,
+            description: opts.description,
+            budgetMonthlyCents: opts.budgetMonthlyCents ? Number(opts.budgetMonthlyCents) : undefined,
+            maxConcurrentIssues: opts.maxConcurrentIssues ? Number(opts.maxConcurrentIssues) : undefined,
+          });
+          printOutput(created, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+    { includeCompany: false },
+  );
+
+  addCommonClientOptions(
+    agent
+      .command("update")
+      .description("Update an agent")
+      .argument("<agentId>", "Agent ID")
+      .option("--name <name>", "Agent name")
+      .option("--role <role>", "Agent role")
+      .option("--description <text>", "Capabilities description")
+      .option("--status <status>", "Agent status")
+      .option("--reports-to <agentId>", "Manager agent ID")
+      .option("--budget-monthly-cents <cents>", "Monthly budget in cents")
+      .option("--max-concurrent-issues <n>", "Max concurrent issues")
+      .action(async (agentId: string, opts: BaseClientOptions & Record<string, string | undefined>) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          const updated = await ctx.api.patch<Agent>(`/api/agents/${agentId}`, {
+            name: opts.name,
+            role: opts.role,
+            description: opts.description,
+            status: opts.status,
+            reportsTo: opts.reportsTo,
+            budgetMonthlyCents: opts.budgetMonthlyCents ? Number(opts.budgetMonthlyCents) : undefined,
+            maxConcurrentIssues: opts.maxConcurrentIssues ? Number(opts.maxConcurrentIssues) : undefined,
+          });
+          printOutput(updated, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    agent
+      .command("keys")
+      .description("List agent API keys")
+      .argument("<agentId>", "Agent ID")
+      .action(async (agentId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          const rows = await ctx.api.get(`/api/agents/${agentId}/keys`);
+          printOutput(rows, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    agent
+      .command("runs")
+      .description("List agent task sessions/runs")
+      .argument("<agentId>", "Agent ID")
+      .action(async (agentId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          const rows = await ctx.api.get(`/api/agents/${agentId}/task-sessions`);
+          printOutput(rows, { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    agent
       .command("local-cli")
       .description(
         "Create an agent API key, install local Paperclip skills for Codex/Claude, and print shell exports",
